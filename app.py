@@ -2,8 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# Store form submissions in memory
-form_data_list = []
+submissions = []
 
 @app.route('/')
 def index():
@@ -13,19 +12,12 @@ def index():
 def submit():
     name = request.form['name']
     email = request.form['email']
-    message = request.form['message']
-
-    form_data_list.append({
-        'name': name,
-        'email': email,
-        'message': message
-    })
-
+    submissions.append({'name': name, 'email': email})
     return redirect(url_for('dashboard'))
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html', submissions=form_data_list)
+    return render_template('dashboard.html', submissions=submissions)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
