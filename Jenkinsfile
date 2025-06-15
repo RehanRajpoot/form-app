@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         PYTHON = "C:/Users/user/AppData/Local/Programs/Python/Python313/python.exe"
-        PIP = "C:/Users/user/AppData/Local/Programs/Python/Python313/Scripts/pip.exe"
     }
 
     stages {
@@ -22,28 +21,30 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                bat "${PYTHON} -m pytest > result.log"
+                bat "${PYTHON} -m pytest > result.log 2>&1"
             }
         }
 
         stage('Show Test Results') {
             steps {
-                bat 'type result.log'
+                script {
+                    def testLog = readFile('result.log')
+                    echo "📄 Test Results:\n${testLog}"
+                }
             }
         }
 
-        // Optional future stage
+        // Optional Deployment Stage
         // stage('Deploy') {
         //     steps {
-        //         echo "Deploying Flask app..."
-        //         // You can run: bat "${PYTHON} app.py" or use a deploy script
+        //         bat "${PYTHON} app.py"
         //     }
         // }
     }
 
     post {
         always {
-            echo 'Cleaning up workspace...'
+            echo '🧹 Cleaning up workspace...'
             deleteDir()
         }
 
@@ -52,7 +53,7 @@ pipeline {
         }
 
         failure {
-            echo '❌ Build failed. Check the result.log output.'
+            echo '❌ Build failed. Check the test results above.'
         }
     }
 }
