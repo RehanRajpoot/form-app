@@ -1,27 +1,31 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
-def contact():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        message = request.form.get('message')
+# Store form submissions in memory
+form_data_list = []
 
-        # Console output
-        print("📥 New Form Submission:")
-        print(f"Name: {name}")
-        print(f"Email: {email}")
-        print(f"Message: {message}")
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-        # Optional: Save to file (local storage)
-        with open('submissions.txt', 'a') as f:
-            f.write(f"{name} | {email} | {message}\n")
+@app.route('/submit', methods=['POST'])
+def submit():
+    name = request.form['name']
+    email = request.form['email']
+    message = request.form['message']
 
-        return '✅ Thank you for your submission!'
+    form_data_list.append({
+        'name': name,
+        'email': email,
+        'message': message
+    })
 
-    return render_template('form.html')
+    return redirect(url_for('dashboard'))
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html', submissions=form_data_list)
 
 if __name__ == '__main__':
     app.run(debug=True)

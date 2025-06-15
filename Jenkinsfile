@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         PYTHON = "C:/Users/user/AppData/Local/Programs/Python/Python313/python.exe"
+        PIP = "C:/Users/user/AppData/Local/Programs/Python/Python313/Scripts/pip.exe"
     }
 
     stages {
@@ -14,16 +15,30 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                bat "${env.PYTHON} -m pip install --upgrade pip"
-                bat "${env.PYTHON} -m pip install -r requirements.txt"
+                bat "${PYTHON} -m pip install --upgrade pip"
+                bat "${PYTHON} -m pip install -r requirements.txt"
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat "${env.PYTHON} -m pytest > result.log"
+                bat "${PYTHON} -m pytest > result.log"
             }
         }
+
+        stage('Show Test Results') {
+            steps {
+                bat 'type result.log'
+            }
+        }
+
+        // Optional future stage
+        // stage('Deploy') {
+        //     steps {
+        //         echo "Deploying Flask app..."
+        //         // You can run: bat "${PYTHON} app.py" or use a deploy script
+        //     }
+        // }
     }
 
     post {
@@ -33,11 +48,11 @@ pipeline {
         }
 
         success {
-            echo 'Build succeeded!'
+            echo '✅ Build succeeded!'
         }
 
         failure {
-            echo 'Build failed. Check the logs.'
+            echo '❌ Build failed. Check the result.log output.'
         }
     }
 }
