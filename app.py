@@ -20,4 +20,4 @@ def dashboard():
     return render_template('dashboard.html', submissions=submissions)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(
