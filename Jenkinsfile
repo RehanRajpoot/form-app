@@ -4,13 +4,13 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/RehanRajpoot/form-app.git'
+                git 'https://github.com/RehanRajpoot/form-app.git'
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'C:\\Python311\\python.exe -m pytest > result.log'
+                bat 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python311\\python.exe -m pytest > result.log'
             }
         }
     }
