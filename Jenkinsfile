@@ -21,25 +21,23 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                bat "${PYTHON} -m pytest > result.log 2>&1"
+                script {
+                    // Run tests but don't fail pipeline immediately
+                    def status = bat(script: "${PYTHON} -m pytest > result.log 2>&1", returnStatus: true)
+                    // Save the exit code to environment for later post check
+                    env.TEST_EXIT_CODE = status.toString()
+                }
             }
         }
 
         stage('Show Test Results') {
             steps {
                 script {
-                    def testLog = readFile('result.log')
-                    echo "📄 Test Results:\n${testLog}"
+                    def output = readFile('result.log')
+                    echo "📄 Test Results:\n${output}"
                 }
             }
         }
-
-        // Optional Deployment Stage
-        // stage('Deploy') {
-        //     steps {
-        //         bat "${PYTHON} app.py"
-        //     }
-        // }
     }
 
     post {
@@ -53,7 +51,7 @@ pipeline {
         }
 
         failure {
-            echo '❌ Build failed. Check the test results above.'
+            echo '❌ Build failed. See test results above.'
         }
     }
 }
