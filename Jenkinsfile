@@ -10,7 +10,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                bat 'python -m pytest > result.log'
+                bat 'C:\\Python311\\python.exe -m pytest > result.log'
             }
         }
     }
