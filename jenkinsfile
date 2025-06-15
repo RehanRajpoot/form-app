@@ -4,21 +4,15 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git credentialsId: 'github-creds',
+                git branch: 'main', 
                     url: 'https://github.com/RehanRajpoot/form-app.git'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                sh 'python3 -m venv venv'
-                sh './venv/bin/pip install -r requirements.txt'
+                // Remove credentialsId if repo is public
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh './venv/bin/python3 -m pytest'
+                bat 'python -m pytest > result.log'
             }
         }
     }
