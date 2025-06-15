@@ -4,9 +4,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'main', 
-                    url: 'https://github.com/RehanRajpoot/form-app.git'
-                // Remove credentialsId if repo is public
+                git branch: 'main', url: 'https://github.com/RehanRajpoot/form-app.git'
             }
         }
 
