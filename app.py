@@ -3,27 +3,24 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# ✅ Replace this with your actual RDS credentials
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://Formdb:Dodadon143?@form-rds-db.cpsy8aqykw31.eu-north-1.rds.amazonaws.com:5432/Formdb'
+# Replace this with your actual RDS password
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:<Dodadon143?>@form-rds-db.cpsy8aqykw31.eu-north-1.rds.amazonaws.com:5432/Formdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# ✅ Model
+# Define table/model
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(100))
 
-# ✅ Create table (run once)
-with app.app_context():
-    db.create_all()
-
-# ✅ Routes
+# Home route - form page
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# Handle form submission
 @app.route('/submit', methods=['POST'])
 def submit():
     name = request.form['name']
@@ -33,10 +30,11 @@ def submit():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
+# Show submitted data
 @app.route('/dashboard')
 def dashboard():
-    all_submissions = Submission.query.all()
-    return render_template('dashboard.html', submissions=all_submissions)
+    all_data = Submission.query.all()
+    return render_template('dashboard.html', submissions=all_data)
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
