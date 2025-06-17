@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # Replace this with your actual RDS password
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:<Dodadon143?>@form-rds-db.cpsy8aqykw31.eu-north-1.rds.amazonaws.com:5432/Formdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dodadon143%3F@form-rds-db.cpsy8aqykw31.eu-north-1.rds.amazonaws.com:5432/Formdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
