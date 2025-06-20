@@ -3,24 +3,24 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Replace this with your actual RDS password
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dodadon143%3F@form-rds-db.cpsy8aqykw31.eu-north-1.rds.amazonaws.com:5432/Formdb'
+# ✅ Correct and secure PostgreSQL connection string
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dodadon143?@form-rds-db.cpsy8aqykw31.eu-north-1.rds.amazonaws.com:5432/Formdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Define table/model
+# ✅ Define the table/model
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))
 
-# Home route - form page
+# ✅ Route: Home / Form
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Handle form submission
+# ✅ Route: Submit form
 @app.route('/submit', methods=['POST'])
 def submit():
     name = request.form['name']
@@ -30,7 +30,7 @@ def submit():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# Show submitted data
+# ✅ Route: Dashboard to view submissions
 @app.route('/dashboard')
 def dashboard():
     all_data = Submission.query.all()
