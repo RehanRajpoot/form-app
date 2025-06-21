@@ -1,40 +1,38 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, flash
+from config import DATABASE_URI
+from models import db, FormSubmission
 
 app = Flask(__name__)
-
-# ✅ Correct and secure PostgreSQL connection string
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dodadon143?@form-rds-db.cpsy8aqykw31.eu-north-1.rds.amazonaws.com:5432/Fromdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'your_secret_key'  # Needed for flash messages
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
-# ✅ Define the table/model
-class Submission(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(100))
+@app.route('/', methods=['GET', 'POST'])
+def form():
+    if request.method == 'POST':
+        try:
+            name = request.form['name']
+            email = request.form['email']
+            message = request.form['message']
 
-# ✅ Route: Home / Form
-@app.route('/')
-def index():
-    return render_template('index.html')
+            data = FormSubmission(name=name, email=email, message=message)
+            db.session.add(data)
+            db.session.commit()
 
-# ✅ Route: Submit form
-@app.route('/submit', methods=['POST'])
-def submit():
-    name = request.form['name']
-    email = request.form['email']
-    new_entry = Submission(name=name, email=email)
-    db.session.add(new_entry)
-    db.session.commit()
-    return redirect(url_for('dashboard'))
+            flash('✅ Form submitted successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'❌ Error: {str(e)}', 'error')
 
-# ✅ Route: Dashboard to view submissions
-@app.route('/dashboard')
-def dashboard():
-    all_data = Submission.query.all()
-    return render_template('dashboard.html', submissions=all_data)
+    return render_template('form.html')
+
+# (Optional) View all submissions route
+@app.route('/submissions')
+def submissions():
+    all_data = FormSubmission.query.all()
+    return render_template('submissions.html', data=all_data)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True)
