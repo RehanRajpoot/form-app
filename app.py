@@ -1,14 +1,20 @@
-from flask import Flask, render_template, request, flash
-from config import DATABASE_URI
+from flask import Flask, render_template, request
 from models import db, FormSubmission
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'your_secret_key'  # Needed for flash messages
 
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dodadon143?@localhost:5432/formdb'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
 db.init_app(app)
 
+# Automatically create tables on startup
+with app.app_context():
+    db.create_all()
+
+# Route for the form
 @app.route('/', methods=['GET', 'POST'])
 def form():
     if request.method == 'POST':
@@ -21,18 +27,17 @@ def form():
             db.session.add(data)
             db.session.commit()
 
-            flash('✅ Form submitted successfully!', 'success')
+            return "Form submitted successfully!"
         except Exception as e:
             db.session.rollback()
-            flash(f'❌ Error: {str(e)}', 'error')
-
+            return f"Error saving data: {e}"
     return render_template('form.html')
 
-# (Optional) View all submissions route
+# Optional route to view submissions
 @app.route('/submissions')
 def submissions():
     all_data = FormSubmission.query.all()
     return render_template('submissions.html', data=all_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
